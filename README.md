@@ -1,1 +1,11 @@
-# tanchiki-android
+# Калькулятор прибыли — Android V1.3
+
+Автономный Android-калькулятор цены торгов и желаемой прибыли для закупок овощей, фруктов и других товаров. Дополнительные расходы задаются **в рублях на 1 кг закупленного товара**.
+
+## Сборка APK
+
+Откройте вкладку **Actions** → **Profit calculator Android APK** → последняя успешная сборка → **Artifacts** → **Kalkulyator_pribyli_V1_3**. Скачайте ZIP, распакуйте файл `Kalkulyator_pribyli_V1_3.apk` и установите его на Android.
+
+Для ручной сборки: `gradle :app:assembleDebug` с JDK 17 и Android SDK.
+
+Проект находится в отдельной ветке `profit-calculator-apk`; основная ветка репозитория не изменена.

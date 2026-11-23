@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#162a49">
+<meta name="description" content="Калькулятор желаемой прибыли и цены торгов с учётом закупки, отходов и расходов">
+<title>Калькулятор прибыли — V1.3</title>
+<style>
+:root{color-scheme:light;--navy:#162a49;--accent:#255fa3;--ink:#1b2d42;--muted:#65788c;--border:#dbe3ec;--bg:#f3f6fa;--white:#fff;--green:#16805a;--red:#bd3745;--amber:#9a6614}
+*{box-sizing:border-box}
+html{font-family:system-ui,-apple-system,Roboto,"Segoe UI",Arial,sans-serif;-webkit-text-size-adjust:100%;font-size:16px}
+body{margin:0;color:var(--ink);background:var(--bg)}
+header{background:var(--navy);color:#fff;padding:22px 18px 25px}
+.head-inner{max-width:780px;margin:auto}
+.eyebrow{font-size:11px;letter-spacing:.11em;font-weight:750;opacity:.7}
+h1{margin:7px 0 7px;font-size:25px;line-height:1.18}header p{margin:0;color:#d4e0ef;font-size:13px;line-height:1.5}
+main{max-width:780px;margin:auto;padding:15px 13px 30px}
+.panel,.hero{background:#fff;border:1px solid var(--border);border-radius:15px;margin-bottom:13px}
+.panel{padding:16px}
+h2{font-size:16px;font-weight:750;margin:0 0 15px}.hint{color:var(--muted);font-size:11px;line-height:1.45;margin:6px 1px 0}
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:16px 13px}
+.field{min-width:0}.field label{font-size:13px;font-weight:650;display:block;margin-bottom:7px;line-height:1.35}
+.inputwrap{display:flex;align-items:center;min-width:0;border:1px solid #c9d5e3;border-radius:10px;overflow:hidden;background:white}
+.inputwrap:focus-within{border-color:var(--accent);outline:2px solid #d8e8fa}
+.inputwrap input{width:100%;min-width:0;flex:1;font:inherit;font-size:17px;color:var(--ink);border:0;outline:0;padding:12px 10px 12px 12px;background:transparent}
+.unit{font-size:11px;color:#728093;white-space:nowrap;padding:0 10px 0 0}
+.target{margin-top:17px;padding:14px;border-radius:11px;border:1px solid #cadbed;background:#f4f8ff}
+.target label{font-weight:750;color:#1f4b80}.target .inputwrap{border-color:#b5cce5}
+.buttons{display:flex;justify-content:flex-end;gap:9px;margin-top:17px}
+button{border:1px solid #cfdae5;background:#fff;color:var(--ink);font:inherit;font-size:13px;font-weight:700;border-radius:10px;padding:10px 14px;cursor:pointer}
+button.primary{background:#eaf2fb;color:#204e83;border-color:#c6d8eb}
+button:active{transform:scale(.98)}
+.hero{overflow:hidden}.hero-main{padding:20px 17px 19px}
+.overline{font-size:12px;font-weight:750;letter-spacing:.045em;color:var(--muted);margin-bottom:8px}
+.big{font-size:clamp(29px,6.8vw,41px);font-weight:820;line-height:1.13;letter-spacing:-.025em;overflow-wrap:anywhere;font-variant-numeric:tabular-nums;color:#215999}
+.sub{font-size:13px;color:var(--muted);line-height:1.5;margin-top:9px}
+.error{color:var(--red)}.good{color:var(--green)}.bad{color:var(--red)}.neutral{color:var(--ink)}
+.metrics{display:grid;grid-template-columns:1fr 1fr 1fr;background:#fbfcfe;border-top:1px solid var(--border)}
+.metric{padding:13px 12px;border-right:1px solid var(--border);min-width:0}.metric:last-child{border-right:0}
+.metric small{display:block;font-size:11px;color:var(--muted);line-height:1.35;min-height:29px}
+.metric strong{display:block;font-size:16px;line-height:1.35;margin-top:7px;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.notice{font-size:12px;line-height:1.55;color:#596b80;margin:9px 0 0}
+.actual{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.actual-stat{border:1px solid var(--border);border-radius:11px;padding:13px;min-width:0}
+.actual-stat span{font-size:12px;color:var(--muted);display:block;line-height:1.4}
+.actual-stat strong{display:block;margin-top:8px;font-size:22px;font-weight:760;overflow-wrap:anywhere;font-variant-numeric:tabular-nums}
+.rows{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px 10px;align-items:baseline;font-size:13px}
+.rows .label{color:#54667a}.rows .value{text-align:right;font-weight:680;white-space:nowrap;font-variant-numeric:tabular-nums}
+.rows .total{border-top:1px solid var(--border);padding-top:13px;font-weight:750;color:var(--ink)}
+.fine{font-size:11.5px;line-height:1.6;color:#68788a;padding:1px 3px}.version{text-align:center;font-size:11px;color:#8493a5;margin:18px 0 0}
+[hidden]{display:none!important}
+@media(max-width:550px){.panel{padding:14px}.fields{gap:13px 10px}.field label{font-size:12px;min-height:32px}.field .inputwrap input{font-size:16px;padding:12px 8px}.unit{padding-right:8px;font-size:11px}.target .field label{min-height:0}.metric{padding:12px 9px}.metric strong{font-size:14px}.actual-stat strong{font-size:19px}}
+@media(max-width:350px){.fields{grid-template-columns:1fr}.field label{min-height:0}.metrics{grid-template-columns:1fr 1fr}.metric:last-child{grid-column:span 2;border-top:1px solid var(--border)}.actual{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><div class="head-inner"><div class="eyebrow">РАСЧЁТ ПОСТАВКИ · V1.3</div><h1>Калькулятор прибыли</h1><p>Укажите желаемый доход — узнаете нужную цену торгов</p></div></header>
+<main>
+<section class="panel" aria-labelledby="params-title"><h2 id="params-title">Параметры партии</h2>
+<div class="fields">
+<div class="field"><label for="buy">Цена закупки</label><div class="inputwrap"><input id="buy" type="text" inputmode="decimal" autocomplete="off" placeholder="30" aria-label="Цена закупки, рублей за килограмм"><span class="unit">₽/кг</span></div></div>
+<div class="field"><label for="qty">Объём закупки</label><div class="inputwrap"><input id="qty" type="text" inputmode="decimal" autocomplete="off" value="1000" aria-label="Объём закупки, килограммов"><span class="unit">кг</span></div></div>
+<div class="field"><label for="waste">Процент отходов</label><div class="inputwrap"><input id="waste" type="text" inputmode="decimal" autocomplete="off" value="0" aria-label="Процент отходов"><span class="unit">%</span></div><p class="hint">От закупленного веса</p></div>
+<div class="field"><label for="extra">Дополнительные расходы на кг</label><div class="inputwrap"><input id="extra" type="text" inputmode="decimal" autocomplete="off" value="0" aria-label="Дополнительные расходы на килограмм закупленного товара, рублей"><span class="unit">₽/кг</span></div><p class="hint">Транспорт, упаковка и прочее на 1 кг закупки</p></div>
+</div>
+<div class="target field"><label for="target">Желаемый доход (чистая прибыль)</label><div class="inputwrap"><input id="target" type="text" inputmode="decimal" autocomplete="off" placeholder="Например, 10000" aria-label="Желаемая чистая прибыль за всю партию, рублей"><span class="unit">₽ за партию</span></div><p class="hint">Сколько рублей хотите заработать после закупки и дополнительных расходов</p></div>
+<div class="buttons"><button type="button" id="clear">Очистить</button><button type="button" id="example" class="primary">Пример</button></div>
+</section>
+<section class="hero" aria-live="polite"><div class="hero-main"><div class="overline">НЕОБХОДИМАЯ ЦЕНА ТОРГОВ</div><div class="big" id="required">—</div><div class="sub" id="required-status">Введите закупочную цену и желаемую прибыль</div></div>
+<div class="metrics"><div class="metric"><small>Желаемый доход</small><strong id="target-out">—</strong></div><div class="metric"><small>Цена безубыточности</small><strong id="breakeven">—</strong></div><div class="metric"><small>Объём на продажу</small><strong id="sale-qty">—</strong></div></div></section>
+<section class="panel" aria-labelledby="check-title"><h2 id="check-title">Проверка цены торгов</h2>
+<div class="field"><label for="sell">Цена торгов (необязательно)</label><div class="inputwrap"><input id="sell" type="text" inputmode="decimal" autocomplete="off" placeholder="Укажите предлагаемую цену" aria-label="Фактическая цена торгов, рублей за килограмм"><span class="unit">₽/кг</span></div><p class="hint">Покажем, сколько вы реально заработаете по этой цене, и сравним с целью</p></div>
+<div class="actual" id="actual-box" style="margin-top:14px" hidden><div class="actual-stat"><span>Прибыль при вашей цене</span><strong id="actual-profit">—</strong></div><div class="actual-stat"><span>Разница с желаемым доходом</span><strong id="delta">—</strong></div></div>
+<p id="actual-status" class="notice" hidden></p>
+</section>
+<section class="panel"><h2>Экономика партии по расчётной цене</h2><div class="rows">
+<div class="label">Закуплено</div><div class="value" id="purchase-qty">—</div>
+<div class="label">Отходы</div><div class="value" id="waste-qty">—</div>
+<div class="label">Стоимость закупки</div><div class="value" id="purchase">—</div>
+<div class="label" id="expenses-label">Дополнительные расходы</div><div class="value" id="expenses">—</div>
+<div class="label total">Все расходы</div><div class="value total" id="costs">—</div>
+<div class="label">Выручка при расчётной цене</div><div class="value" id="revenue">—</div>
+<div class="label total">Расчётная прибыль</div><div class="value total" id="calc-profit">—</div>
+</div><p class="notice">Цена округляется вверх до копейки, поэтому итоговая прибыль может быть немного выше заданной цели.</p></section>
+<p class="fine"><b>Формула:</b> нужная цена торгов = ((цена закупки + доп. расходы на кг) × закупленный вес + желаемый доход) ÷ (закупленный вес × (1 − отходы / 100)). И отходы, и дополнительные расходы рассчитываются от закупленного веса. НДС и налоги отдельно не вычисляются; для корректного расчёта цены закупки и торгов должны быть указаны на сопоставимой основе по НДС, а неучтённые издержки следует прибавлять к расходам.</p>
+<p class="version">Калькулятор прибыли · V1.3 · Работает без интернета</p>
+</main>
+<script>
+'use strict';
+(function(){
+const ids=['buy','qty','waste','extra','target','sell'];
+const e=id=>document.getElementById(id);
+const fmt=(n,d=2)=>Number.isFinite(n)?new Intl.NumberFormat('ru-RU',{minimumFractionDigits:d,maximumFractionDigits:d}).format(n):'—';
+const rub=n=>Number.isFinite(n)?fmt(n)+' ₽':'—';
+const kg=n=>Number.isFinite(n)?new Intl.NumberFormat('ru-RU',{maximumFractionDigits:3}).format(n)+' кг':'—';
+const val=s=>{let a=String(s).replace(/[\s\u00a0\u202f]/g,'').replace(',','.');return a===''?NaN:Number(a)};
+const set=(id,value)=>{e(id).textContent=value};
+const idsToBlank=['required','target-out','breakeven','sale-qty','purchase-qty','waste-qty','purchase','expenses','costs','revenue','calc-profit','actual-profit','delta'];
+function blank(msg){idsToBlank.forEach(id=>set(id,'—'));set('expenses-label','Дополнительные расходы');set('required-status',msg);e('required-status').className='sub error';e('actual-box').hidden=true;e('actual-status').hidden=true}
+// Cents rounding includes a tiny epsilon to avoid incorrect round-up from floating-point jitter.
+function roundUpCents(n){return Math.ceil(n*100-1e-9)/100}
+function render(){
+  const [buy,qty,waste,extra,target,sell]=ids.map(id=>val(e(id).value));
+  if(!Number.isFinite(buy)||!Number.isFinite(target)){blank('Введите закупочную цену и желаемый доход');return}
+  if([qty,waste,extra].some(n=>!Number.isFinite(n))){blank('Проверьте заполнение параметров партии');return}
+  if(buy<0||qty<=0||waste<0||waste>100||extra<0||target<0){blank('Цены, расходы и доход не могут быть отрицательными; вес должен быть больше нуля, отходы — от 0 до 100 %');return}
+  const sellQty=qty*(1-waste/100),costBuy=qty*buy,costExtra=qty*extra,total=costBuy+costExtra;
+  if(sellQty<=0){blank('При отходах 100 % нет товара для продажи. Нельзя рассчитать цену торгов.');return}
+  const required=roundUpCents((total+target)/sellQty);
+  const breakeven=roundUpCents(total/sellQty);
+  const revenue=required*sellQty,calcProfit=revenue-total;
+  set('required',fmt(required)+' ₽/кг');set('target-out',rub(target));set('breakeven',fmt(breakeven)+' ₽/кг');set('sale-qty',kg(sellQty));
+  set('purchase-qty',kg(qty));set('waste-qty',kg(qty-sellQty));set('purchase',rub(costBuy));set('expenses-label','Доп. расходы ('+fmt(extra)+' ₽/кг × '+kg(qty)+')');set('expenses',rub(costExtra));set('costs',rub(total));set('revenue',rub(revenue));set('calc-profit',rub(calcProfit));
+  set('required-status','Для получения '+rub(target)+' с партии необходимо продать '+kg(sellQty)+' по указанной цене.');e('required-status').className='sub';
+  if(e('sell').value.trim()===''){
+    e('actual-box').hidden=true;e('actual-status').hidden=true;
+  }else{
+    e('actual-box').hidden=false;e('actual-status').hidden=false;
+    if(!Number.isFinite(sell)||sell<0){set('actual-profit','—');set('delta','—');set('actual-status','Укажите корректную неотрицательную цену торгов.');e('actual-status').className='notice error'}
+    else{
+      const actual=sell*sellQty-total,diff=actual-target;
+      set('actual-profit',rub(actual));e('actual-profit').className=actual>=-0.005?'good':'bad';
+      set('delta',(diff>0.005?'+':'')+rub(diff));e('delta').className=diff>=-0.005?'good':'bad';
+      set('actual-status',diff>=-0.005?'По этой цене желаемый доход достигнут.':'По этой цене доход будет ниже желаемого.');
+      e('actual-status').className='notice '+(diff>=-0.005?'good':'bad');
+    }
+  }
+  try{localStorage.setItem('profitcalc-v1-2',JSON.stringify(Object.fromEntries(ids.map(id=>[id,e(id).value]))))}catch(err){}
+}
+ids.forEach(id=>e(id).addEventListener('input',render));
+e('example').addEventListener('click',()=>{Object.entries({buy:'30',qty:'1000',waste:'8',extra:'5',target:'10000',sell:'50'}).forEach(([id,v])=>e(id).value=v);render()});
+e('clear').addEventListener('click',()=>{Object.entries({buy:'',qty:'1000',waste:'0',extra:'0',target:'',sell:''}).forEach(([id,v])=>e(id).value=v);render();e('buy').focus()});
+try{let saved=JSON.parse(localStorage.getItem('profitcalc-v1-2')||'null');
+if(saved&&typeof saved==='object')ids.forEach(id=>{if(Object.prototype.hasOwnProperty.call(saved,id))e(id).value=saved[id]});
+else {
+  // V1.1 stored additional expenses as a total. Convert that amount to per-kg when importing.
+  let old=JSON.parse(localStorage.getItem('profitcalc-v1-1')||'null');
+  if(old&&typeof old==='object'){
+    ids.forEach(id=>{if(Object.prototype.hasOwnProperty.call(old,id))e(id).value=old[id]});
+    const oldQty=val(old.qty),oldExtra=val(old.extra);
+    e('extra').value=Number.isFinite(oldExtra)&&oldExtra>=0&&Number.isFinite(oldQty)&&oldQty>0?String(Number((oldExtra/oldQty).toFixed(6))):'0';
+  } else {
+    // Older versions also stored expenses for the entire batch.
+    old=JSON.parse(localStorage.getItem('profitcalc-v1')||'null');
+    if(old&&typeof old==='object'){
+      ids.forEach(id=>{if(Object.prototype.hasOwnProperty.call(old,id))e(id).value=old[id]});
+      const oldQty=val(old.qty),oldExtra=val(old.extra);
+      e('extra').value=Number.isFinite(oldExtra)&&oldExtra>=0&&Number.isFinite(oldQty)&&oldQty>0?String(Number((oldExtra/oldQty).toFixed(6))):'0';
+    }
+  }
+}}catch(err){}
+render();
+})();
+</script>
+</body>
+</html>
